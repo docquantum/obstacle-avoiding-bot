@@ -4,6 +4,8 @@ This is an assignment for the embedded systems class where we use an Arduino Uno
 
 ## Wiring
 
+There are two folders with relevant files on the repository. One has Fritzing schematic files, the other exports of the Fritzing schematics and photos of the robot itself.
+
 TODO:
 - Will be using Fritzing to create a wiring diagram
 - Add photo of currently wired robot as well
@@ -13,7 +15,7 @@ TODO:
 
 The project is built on the PlatformIO IDE framework which contains all the tools necessary to create proper code for embedded systems, such as the Arduino Uno. Although it is built on this system, the code can be easily adapted to the Arduino IDE which uses .ino files.
 
-The project is split into 3 directories for organization.
+The project code is split into 3 directories for organization.
 - 'src' will contain the main code and any non library code files.
 - 'lib' contains custom libraries used in the project to help modularize and keep the code clean.
 - 'include' contains any header files used by code in 'src' that's not a library.
