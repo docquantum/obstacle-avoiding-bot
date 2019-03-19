@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <avr/io.h>
+#include <motors.h>
 
 /*
  * HBridge - Motors - Timer0
@@ -11,7 +12,7 @@
  * PWM_R = pin05 = PD5 = OC0B
 */
 
-void setUpMotors(){
+void setUpMotors(uint8_t left, uint8_t right){
     //Pins running PWM for h-bridge enable
     DDRD |= (1 << PD6) | (1 << PD5); //Set pins 6/5 as output
     PORTD |= (1 << PD6) | (1 << PD5); //Set pins 6/5 as HIGH
@@ -21,12 +22,16 @@ void setUpMotors(){
     TCCR0B |=  0 << CS02 | 1 << CS01 | 1 << CS00;
     
     //Sets the duty cycle (Speed)
-    OCR0B = 0xA0;
-    OCR0A = 0xA0;
+    LEFT_SPEED = left;
+    RIGHT_SPEED = right;
 
     //Sets up the H-bridge IN pins
     DDRB |= (1 << PB5) | (1 << PB4); // Set pins 13/12 as output
     DDRD |= (1 << PD4) | (1 << PD2); // Set pins 4/2 as output
+}
+
+void setSpeed(uint8_t side,uint8_t speed){
+    side = speed;
 }
 
 void moveForward(){

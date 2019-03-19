@@ -1,8 +1,17 @@
+#define LEFT_SPEED OCR0A
+#define RIGHT_SPEED OCR0B
+
 /**
  * Sets up the pins for the motors using register calls.
  * Also starts the PWM for the enable pins.
 */ 
-void setUpMotors();
+void setUpMotors(uint8_t left, uint8_t right);
+
+/**
+ * Sets the speed of the given side (LEFT/RIGHT_SPEED);
+ * speed: (0 to 255)
+*/
+void setSpeed(uint8_t side, uint8_t speed);
 
 /**
  * Sets movement to forward;

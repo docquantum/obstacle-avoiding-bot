@@ -64,7 +64,7 @@ void followWall(int8_t wallSide){
 }
 
 void setup() {
-  setUpMotors();
+  setUpMotors(180, 180);
   setUpUltraSonic();
   testServo();
   wallSide = findWall();
