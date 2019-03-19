@@ -11,7 +11,7 @@
  * PWM_R = pin05 = PD5 = OC0B
 */
 
-void setupMotors(){
+void setUpMotors(){
     //Pins running PWM for h-bridge enable
     DDRD |= (1 << PD6) | (1 << PD5); //Set pins 6/5 as output
     PORTD |= (1 << PD6) | (1 << PD5); //Set pins 6/5 as HIGH

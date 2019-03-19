@@ -2,7 +2,7 @@
  * Sets up the pins for the motors using register calls.
  * Also starts the PWM for the enable pins.
 */ 
-void setupMotors();
+void setUpMotors();
 
 /**
  * Sets movement to forward;
