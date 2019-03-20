@@ -31,9 +31,17 @@ typedef enum {
   WALL_FAR_FRONT_CLOSE
 } State;
 
+typedef enum {
+  FORWARD,
+  BACKWARD,
+  TURN_RIGHT,
+  TURN_LEFT
+} SimpleState;
+
 int8_t wallSide = 0;
 State curState = START_STATE;
 State prevState = START_STATE;
+SimpleState state;
 
 
 
@@ -50,48 +58,105 @@ int8_t findWall(){
 }
 
 // Checks front, if no obstacles, drive forward.
-//    else, move backward (for now)
+//    else, stop
 // Checks distance to wall.
 //    If distance changes, adjust accordingly.
 void followWall(){
   rotateSensor(0);
   delay(30);
-  if(getDistance() > 10){
+  uint16_t frontDistance = getDistance();
+  if(frontDistance > 10){
     moveForward();
-  } else{
-    moveBackward();
+  } else {
+    stop();
   }
+
   rotateSensor(wallSide);
   delay(30);
-  uint16_t curDist = getDistance();
-  if(curDist < 5){
+  uint16_t wallDistance = getDistance();
+  //if front is close but wall is clear
+  if(wallDistance < 10 && wallDistance >= 12 && wallDistance <= 10){
+    //check other wall
+    rotateSensor(-wallSide);
+    delay(30);
+    //if other wall is clear, turn ~90 degrees
+    if(getDistance() > 12){
+      if(wallSide == -2){
+        turnRight();
+        delay(500);
+        stop();
+      }
+      //Else, turn around and reset wall side
+    } else{
+      turnRight();
+      delay(700);
+      stop();
+      wallSide = findWall();
+    }
+  //if wall is really close, turn away hard from the wall
+  } else if(wallDistance < 4){
     stop();
     if(wallSide == -2){
       turnRight();
+      delay(250);
+      stop();
+      delay(50);
+      moveForward();
+      delay(300);
+      stop();
+      delay(50);
+      turnLeft();
     } else {
       turnLeft();
+      delay(250);
+      stop();
+      delay(50);
+      moveForward();
+      delay(300);
+      stop();
+      delay(50);
+      turnRight();
     }
-    delay(100);
+    delay(150);
     stop();
-  } else if(curDist < 10){
-    if(wallSide < 0)
-      stopRight(12 - (uint16_t)curDist*1.1 + 20);
-    else
-      stopLeft(12 - (uint16_t)curDist*1.1 + 20);
-  } else if(curDist > 15){
+  //if wall is too close, turn away from wall a little
+  } else if(wallDistance < 10){
+    if(wallSide == -2){
+      stopRight(20);
+    } else{
+      stopLeft(20);
+    }
+  } else if(wallDistance > 16){
     stop();
     if(wallSide == -2){
       turnLeft();
+      delay(250);
+      stop();
+      delay(50);
+      moveForward();
+      delay(300);
+      stop();
+      delay(50);
+      turnRight();
     } else {
       turnRight();
+      delay(250);
+      stop();
+      delay(50);
+      moveForward();
+      delay(300);
+      stop();
+      delay(50);
+      turnLeft();
     }
-    delay(100);
+    delay(150);
     stop();
-  } else if(curDist > 12){
-    if(wallSide < 0)
-      stopLeft((uint16_t)curDist*1.1 - 12 + 20);
-    else
-      stopRight((uint16_t)curDist*1.1 - 12 + 20);
+  } else if(wallDistance > 12){
+    if(wallSide == -2){
+      stopLeft(20);
+    } else{
+      stopRight(20);
+    }
   }
 }
 /**
