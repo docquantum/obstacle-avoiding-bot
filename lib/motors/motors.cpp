@@ -30,7 +30,7 @@ void setUpMotors(uint8_t left, uint8_t right){
     DDRD |= (1 << PD4) | (1 << PD2); // Set pins 4/2 as output
 }
 
-void setSpeed(uint8_t side,uint8_t speed){
+void setSpeed(uint8_t side, uint8_t speed){
     side = speed;
 }
 

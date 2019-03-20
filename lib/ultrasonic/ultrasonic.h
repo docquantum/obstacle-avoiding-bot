@@ -37,7 +37,7 @@ uint16_t readServoPos();
 /**
  * Given a position (-2 to 2), rotates the sensor to that
  * position, waiting until the servo is at that position
- * using the readServoPos function, and then waiting 10ms
+ * using the readServoPos function, and then waiting 20ms
  * for good measure before returning back to the calling
  * function.
  * 

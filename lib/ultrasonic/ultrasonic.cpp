@@ -109,23 +109,23 @@ void rotateSensor(int8_t position){
     if(position == 2) {
         OCR2A = 0; //90 Right
         while(readServoPos() > 22){};
-        delay(10);
+        delay(20);
     } else if(position == 1){
         OCR2A = 14; //45 Diagonal Right
         while(readServoPos() < 156 || readServoPos() > 166){};
-        delay(10);
+        delay(20);
     } else if(position == 0){
         OCR2A = 21; //0 Middle
         while(readServoPos() < 301 || readServoPos() > 411){};
-        delay(10);
+        delay(20);
     } else if(position == -1){
         OCR2A = 28; //-45 Diagonal Left
         while(readServoPos() < 444 || readServoPos() > 464){};
-        delay(10);
+        delay(20);
     } else if(position == -2){
         OCR2A = 36; //-90 Left
         while(readServoPos() < 606 || readServoPos() > 616){};
-        delay(10);
+        delay(20);
     }
 }
 
