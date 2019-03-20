@@ -39,22 +39,22 @@ int8_t findWall(){
  * After the wall side has been determined, follows that wall adjusting
  * it's direction depending on how far away it is from the wall.
  * 
- * Adjusts according to how close or far away it is from a wall, turning
- * harder in both situations when it's either closer or farther. 
 */ 
 void followWall(){
+  moveForward();
+  delay(20);
   uint16_t wallDistance = getDistance();
   if(wallDistance <= 9){
     if(wallSide == -2){
-      stopRight(12 - (uint16_t)wallDistance*1.2 + 30);
+      stopRight(20);
     } else{
-      stopLeft(12 - (uint16_t)wallDistance*1.2 + 20);
+      stopLeft(20);
     }
   } else if(wallDistance >= 13){
     if(wallSide == -2){
-      stopLeft((uint16_t)wallDistance*1.1 - 12 + 30);
+      stopLeft(20);
     } else{
-      stopRight((uint16_t)wallDistance*1.1 - 12 + 30);
+      stopRight(20);
     }
   }
 }
