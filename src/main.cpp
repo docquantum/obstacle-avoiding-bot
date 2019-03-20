@@ -22,8 +22,6 @@
 */
 
 int8_t wallSide = 0;
-State curState = START_STATE;
-State prevState = START_STATE;
 
 //returns -2 for left, 2 for right
 int8_t findWall(){
