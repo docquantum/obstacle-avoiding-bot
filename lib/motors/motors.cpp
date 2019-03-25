@@ -1,3 +1,13 @@
+/**
+ * Daniel Shchur
+ * 2019-03-25
+ * 
+ * Motor library implementation that has standard functions to
+ * manipulate robot movement via the two motors. Built specifically
+ * for the robot wired in this project. Pin mappings would need to
+ * change if transferred to another robot.
+*/ 
+
 #include <Arduino.h>
 #include <avr/io.h>
 #include <motors.h>

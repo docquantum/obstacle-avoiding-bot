@@ -1,3 +1,26 @@
+/**
+ * Daniel Shchur
+ * 2019-03-25
+ * 
+ * Main programming of an autonomous robot built for an
+ * embedded systems course. Relies on separately implemented
+ * Ultrasonic and Motor libraries that contain functions to
+ * help with the algorithms used here. 
+ * 
+ * Currently, the robot follows a wall ~12 inches consistently.
+ * Must be a flat straight wall. If the wall is not flat, the
+ * movement is not consistent, but the robot moves towards/away
+ * from the wall to compensate.
+ * 
+ * Relies on the ultrasonic sensor to know how far away it is
+ * from the wall in question.
+ * 
+ * Future:
+ * Will need to be able to navigate a "maze" environment without
+ * getting stuck or running into wall.
+ * 
+*/ 
+
 #include <Arduino.h>
 #include "motors.h"
 #include "ultrasonic.h"

@@ -1,3 +1,14 @@
+/**
+ * Daniel Shchur
+ * 2019-03-25
+ * 
+ * Ultrasonic library implementation that has standard functions
+ * to trigger, read, and rotate the ultrasonic sensor on robot.
+ * Built specifically for the robot wired in this project.
+ * Pin mappings would need to change if transferred to another
+ * robot.
+*/ 
+
 #include <Arduino.h>
 #include <avr/io.h>
 

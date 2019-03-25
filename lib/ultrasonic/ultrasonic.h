@@ -1,3 +1,13 @@
+/**
+ * Daniel Shchur
+ * 2019-03-25
+ * 
+ * Ultrasonic library header that has standard functions to
+ * trigger, read, and rotate the ultrasonic sensor on robot.
+ * Built specifically for the robot wired in this project.
+ * Pin mappings would need to change if transferred to another
+ * robot.
+*/ 
 
 /**
  * Sets registers to set up the trigger pin and echo pin
@@ -25,12 +35,12 @@ void trigUltrasonic();
 uint16_t getDistance();
 
 /**
- * Using a modified servo, reads the value off the pot-
- * entiometer on the analog pin A0 to give a reading of
- * where the servo arm is currently located.
+ * Using a modified servo, reads the value off the potentiometer
+ * on the analog pin A0 to give a reading of where the servo arm
+ * is currently located.
  * 
- * Used to know when the servo is at the correct position
- * since it takes time for it to turn the sensor. 
+ * Used to know when the servo is at the correct position since
+ * it takes time for it to turn the sensor. 
 */ 
 uint16_t readServoPos();
 
