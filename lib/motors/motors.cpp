@@ -86,32 +86,32 @@ void stopRight(uint8_t time){
 void testMotors(){
     moveForward();
     delay(1000);
-    stop();
+    stopMotors();
     delay(500);
 
     moveBackward();
     delay(1000);
-    stop();
+    stopMotors();
     delay(500);
 
     turnLeft();
     delay(200);
-    stop();
+    stopMotors();
     delay(500);
 
     turnRight();
     delay(200);
-    stop();
+    stopMotors();
     delay(500);
 
     turnLeft();
     delay(500);
-    stop();
+    stopMotors();
     delay(500);
 
     turnRight();
     delay(500);
-    stop();
+    stopMotors();
     delay(500);
 }
 
