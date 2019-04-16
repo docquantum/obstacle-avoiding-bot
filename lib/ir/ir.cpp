@@ -68,6 +68,7 @@ volatile uint8_t dataReady;
 void decodeIR() {
   // Waiting for new IR packet
   while(!newIrPacket);
+  newIrPacket = FALSE;
 
   if(dataReady){
     // Atomicly get data and reset data flag
@@ -130,7 +131,6 @@ void setUpIR() {
 
   // Set falling edge detection for pin 1 interupts
   SET_FALLING;
-
 }
 
 /**
