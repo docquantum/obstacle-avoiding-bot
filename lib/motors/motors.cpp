@@ -64,7 +64,7 @@ void turnRight(){
     PORTD = (PORTD & ~(1 << PD2)) | 1 << PD4;
 }
 
-void stop(){
+void stopMotors(){
     PORTB &= ~(1 << PB5 | 1 << PB4);
     PORTD &= ~(1 << PD4 | 1 << PD2);
 }

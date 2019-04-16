@@ -51,7 +51,7 @@ void turnRight();
  * Stops movement;
  * Sets all INs to LOW
 */
-void stop();
+void stopMotors();
 
 /**
  * Stops right Wheel for a given amount of time in ms;
