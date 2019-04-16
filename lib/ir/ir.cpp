@@ -138,7 +138,7 @@ ISR(TIMER1_COMPA_vect){
   // Disable interrupt on match with OCR1A
   TIMSK1 &= ~(1 << OCIE1A);
   // Clear the packet index
-  irIndex = 0;
+  packetIndex = 0;
   // Ready for a new packet.
   newIrPacket = TRUE;
 }
