@@ -32,8 +32,8 @@
 #include "motors.h"
 
 #define SAMPLE_SIZE       34
-#define IR_DECODER_PIN    (PIND & (1 << PIND1))
-#define IR_PIN            (PD1)
+#define IR_DECODER_PIN    (PIND & (1 << PIND2))
+#define IR_PIN            PD2
 #define SET_FALLING       (EICRA = (EICRA & ~(1 << ISC00)) | (1 << ISC01))
 #define SET_RISING        (EICRA |= (1 << ISC00) | (1 << ISC01))
 // falling if 0, rising if 1
@@ -58,7 +58,6 @@ void(* resetFunc) (void) = 0;
 volatile uint8_t newIrPacket = FALSE;
 volatile uint32_t irPacket;
 uint32_t oldIrPacket;
-volatile uint8_t packetData[SAMPLE_SIZE];
 volatile uint8_t packetIndex;
 volatile uint8_t dataReady;
 
@@ -67,6 +66,7 @@ volatile uint8_t dataReady;
  */
 void decodeIR() {
   // Waiting for new IR packet
+  Serial.println("Waiting for new Packet");
   while(!newIrPacket);
   newIrPacket = FALSE;
 
@@ -74,6 +74,7 @@ void decodeIR() {
     // Atomicly get data and reset data flag
     cli();
     oldIrPacket = irPacket;
+    irPacket = 0x0;
     dataReady = 0;
     sei();
     if(oldIrPacket == VOLUP_BTN){
@@ -85,21 +86,21 @@ void decodeIR() {
     } else if(oldIrPacket == RSKP_BTN){
       turnRight();
     } else if(oldIrPacket == UP_BTN){
-      setSpeed(LEFT_SPEED,(LEFT_SPEED+5));
-      setSpeed(RIGHT_SPEED,(RIGHT_SPEED+5));
+      LEFT_SPEED += 20;
+      RIGHT_SPEED +=20;
     } else if(oldIrPacket == DOWN_BTN){
-      setSpeed(LEFT_SPEED,(LEFT_SPEED-5));
-      setSpeed(RIGHT_SPEED,(RIGHT_SPEED-5));
+      LEFT_SPEED -= 20;
+      RIGHT_SPEED -=20;
     } else if(oldIrPacket == PAUSE_BTN){
       stopMotors();
     } else if(oldIrPacket == POWER_BTN){
+      stopMotors();
       resetFunc();
     } else if(oldIrPacket == FUNC_BTN){
       //set up logic to switch to auto move mode
     }
   }
 }
-
 
 /**
  * Sets up the IR
@@ -128,8 +129,11 @@ void setUpIR() {
   // Set Pin 1 for IR input
 	DDRD &= ~(1 << IR_PIN); // Set as input
 	PORTD |= (1 << IR_PIN); // Pullup high
+  
+  // Enable External Interrupt Mask 0
+  EIMSK |= (1 << INT0);
 
-  // Set falling edge detection for pin 1 interupts
+  // Set falling edge detection for pin 2 interupts
   SET_FALLING;
 }
 
@@ -153,18 +157,22 @@ ISR(TIMER1_COMPA_vect){
 */ 
 ISR(INT0_vect){
   if(!EDGE){
-    // Store count into packet data
-    packetData[packetIndex] = TCNT1;
+    uint16_t pulseWidth = TCNT1;
     if(packetIndex > 0 && packetIndex < 33){
-      if(packetData[packetIndex] > 350) {
+      if(pulseWidth > 350) {
         // Leftshift and OR in 1 on MSB
         irPacket = (irPacket << 1) | 1;
       } else{
         // Leftshift
-        irPacket = (irPacket << 1);
+        irPacket = irPacket << 1;
       }
     } else if(packetIndex == 33){
       dataReady = 1;
+    }
+    packetIndex++;
+    // Get rid of residual data on the first bit
+    if(pulseWidth > 1200){
+      packetIndex--;
     }
     // Disable interrupt on match with OCR1A
     TIMSK1 &= ~(1 << OCIE1A);
@@ -172,7 +180,8 @@ ISR(INT0_vect){
     SET_RISING;
   } else{
     // Clear counter
-    TCNT1 = 0;
+    TCNT1H = 0;
+    TCNT1L = 0;
     // Clear Output Compare A flag 
     TIFR1 |= (1 << OCF1A);
     // Enable interrupt on match with OCR1A
