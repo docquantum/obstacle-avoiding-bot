@@ -24,6 +24,7 @@
 #include <Arduino.h>
 #include "motors.h"
 #include "ultrasonic.h"
+#include "ir.h"
 
 /* Pin Layout
  *
@@ -82,8 +83,7 @@ void followWall(){
   }
 }
 
-void setup() {
-  setUpMotors(200, 200);
+void setUpForWall(){
   setUpUltraSonic();
   testServo();
   wallSide = findWall();
@@ -91,6 +91,12 @@ void setup() {
   moveForward();
 }
 
+void setup() {
+  setUpMotors(200, 200);
+  //setUpForWall();
+  setUpIR();
+}
+
 void loop() {
-  followWall();
+  decodeIR();
 }
