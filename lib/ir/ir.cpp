@@ -71,12 +71,11 @@ void decodeIR() {
   newIrPacket = FALSE;
 
   if(dataReady){
-    // Atomicly get data and reset data flag
+    // Atomicly get data, reset flags, parse info
     cli();
     oldIrPacket = irPacket;
     irPacket = 0x0;
     dataReady = 0;
-    sei();
     if(oldIrPacket == VOLUP_BTN){
       moveForward();
     } else if(oldIrPacket == VOLDOWN_BTN){
@@ -99,6 +98,11 @@ void decodeIR() {
     } else if(oldIrPacket == FUNC_BTN){
       //set up logic to switch to auto move mode
     }
+    //reset timer to make sure funky things stop from
+    //happening when interupts are re-enabled.
+    TCNT1H = 0;
+    TCNT1L = 0;
+    sei();
   }
 }
 

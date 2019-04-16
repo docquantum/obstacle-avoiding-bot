@@ -95,7 +95,6 @@ void setup() {
   setUpMotors(200, 200);
   //setUpForWall();
   setUpIR();
-  sei();
 }
 
 void loop() {
