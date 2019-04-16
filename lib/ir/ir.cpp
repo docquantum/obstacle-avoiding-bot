@@ -32,8 +32,8 @@
 #include "motors.h"
 
 #define SAMPLE_SIZE       34
-#define IR_DECODER_PIN    (PIND & (1 << PIND2)) // (i.e. Digital Pin 2)
-#define IR_PIN            (PIND2)
+#define IR_DECODER_PIN    (PIND & (1 << PIND1))
+#define IR_PIN            (PD1)
 #define SET_FALLING       (EICRA = (EICRA & ~(1 << ISC00)) | (1 << ISC01))
 #define SET_RISING        (EICRA |= (1 << ISC00) | (1 << ISC01))
 // falling if 0, rising if 1
@@ -124,9 +124,12 @@ void setUpIR() {
   TCNT1H = 0;
   TCNT1L = 0;
 
-  // Set Pin 2 for IR input
-	DDRD &= ~(1 << PD2);  // Set as input
-	PORTD |= (1 << PD2);	// Pullup high
+  // Set Pin 1 for IR input
+	DDRD &= ~(1 << IR_PIN); // Set as input
+	PORTD |= (1 << IR_PIN); // Pullup high
+
+  // Set falling edge detection for pin 1 interupts
+  SET_FALLING;
 
 }
 
