@@ -69,14 +69,14 @@ void stopMotors(){
     PORTD &= ~(1 << PD4 | 1 << PD3);
 }
 
-void stopLeft(uint8_t time){
+void stopLeft(uint16_t time){
     uint8_t oldPORTB = PORTB;
     PORTB &= ~(1 << PB5 | 1 << PB4);
     delay(time);
     PORTB = oldPORTB;
 }
 
-void stopRight(uint8_t time){
+void stopRight(uint16_t time){
     uint8_t oldPORTD = PORTD;
     PORTD &= ~(1 << PD4 | 1 << PD3);
     delay(time);

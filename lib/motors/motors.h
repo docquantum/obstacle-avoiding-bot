@@ -57,13 +57,13 @@ void stopMotors();
  * Stops right Wheel for a given amount of time in ms;
  * Brings it back to previous state at end.
 */
-void stopRight(uint8_t time);
+void stopRight(uint16_t time);
 
 /**
  * Stops left Wheel for a given amount of time in ms;
  * Brings it back to previous state at end.
 */
-void stopLeft(uint8_t time);
+void stopLeft(uint16_t time);
 
 /**
  * Cycles through the functions that
