@@ -11,6 +11,7 @@
 
 #include <Arduino.h>
 #include <avr/io.h>
+#include <motors.h>
 
 // Sets up vars that will be changed in interupts
 volatile uint16_t count = 0;
@@ -33,77 +34,97 @@ void setUpUltraSonic(){
     DDRB &= ~(0 << PB0); //Sets pin 8 for echo input
 
     //Init counter1
-    TCCR1A = 0; //Standard mode (Fall over at MAX)
-    TCCR1B |= 1 << CS11 | 1 << CS10 | 1 << ICES1; //Set clock to count up clk/64 and rising edge
+    TCCR1A = 0;
+    //Set clock to count up clk/64 and falling edge
+    TCCR1B |= 1 << CS11 | 1 << CS10;
     TCCR1C = 0;
     //Set counter to zero, high byte first
     TCNT1H = 0;
     TCNT1L = 0;
-    //Enable input capture interrupts
-    TIMSK1 |= 1 << ICIE1;
-    //Clears input capture flag
-    TIFR1 = 0;
+    // //Enable input capture interrupts
+    // TIMSK1 |= (1 << ICIE1);
+    // // Clear input capture and output compare A flag 
+    TIFR1 |= (1 << OCF1A) | (1 << ICIE1);
+    // Roll over every 40ms
+    OCR1A = 10000;
+
+    DDRD |= (1 << PD0); // Set pin 0 as output
 
     //Sets up the servo that turns the sensor
     setUpServo();
 }
 
 /**
- * Interupt Sub Routine that gets called when an event is captured
- * on the input capture pin for Timer1
- * 
- * When rising edge triggers, reset timer and set to falling edge
- * detection.
+ * Interupt Sub Routine that gets called when a falling edge event
+ * is captured on the input capture pin for Timer1.
  * 
  * When falling edge triggers, get current timer value, then set
- * back to rising edge detection for next reading, setting the
- * "Distance Ready" flag to true. 
+ * the "Distance Ready" flag to true. 
 */
-ISR (TIMER1_CAPT_vect){
-    //On rising edge
-    if (TCCR1B & (1<<ICES1)) {
-        //Set to detect falling edge
-        TCCR1B &= ~(1<<ICES1); 
-        //Clear timer
-        TCNT1H = 0;
-        TCNT1L = 0;
-    } else { //On falling edge
-        //Reset detect falling edge
-        TCCR1B |= (1<<ICES1); 
-        //Get count
-        count = ICR1;
-        //Distance ready to be read
-        distanceReady = 1; 
-    }
-}
+// ISR (TIMER1_CAPT_vect){
+//     //Get count
+//     count = ICR1;
+//     // Disable interrupt on match with OCR1A
+//     TIMSK1 &= ~(1 << OCIE1A);
+//     //Distance ready to be read
+//     distanceReady = 1;
+// }
 
 void trigUltrasonic(){
-    distanceReady = 0;
+    //distanceReady = 0;
+    //Send pulse
     PORTD |= 1 << PD7;
     delayMicroseconds(10);
     PORTD &= ~(1 << PD7);
+    // Clear Output Compare A flag 
+    TIFR1 |= (1 << OCF1A);
+    // Enable interrupt on match with OCR1A
+    TIMSK1 |= (1 << OCIE1A);
+}
+
+/**
+ * This function is called whenever the timer 1
+ * output compare match OCR1A is generated.
+*/
+ISR(TIMER1_COMPA_vect){
+    if(!(PINB & (1 << PINB0))){
+        stopMotors();
+        trigUltrasonic();
+        if(PIND & (1 << PIND0)){
+            PORTD &= ~(1 << PD0); //Toggle pin 0
+        }else{
+            PORTD |= (1 << PD0); //Toggle pin 0
+        }
+        
+    }
 }
 
 uint16_t getDistance(){
     trigUltrasonic();
-    while(!distanceReady){};
+    // while echo is low
+    while(!(PINB & (1 << PINB0)));
+    //Clear timer
+    TCNT1H = 0;
+    TCNT1L = 0;
+    // while echo is high
+    while((PINB & (1 << PINB0)));
+    // get count
+    count = TCNT1;
+    // Disable interrupt on match with OCR1A
+    TIMSK1 &= ~(1 << OCIE1A);
     return (((count/(37))) < 0) ? 0 : ((count/(37)));
 }
 
 uint16_t readServoPos(){
     // Tell it to use internal Vcc
     ADMUX |= 1 << REFS0;
-
     // Start conversion
     ADCSRA |= 1 << ADSC;
-
     // Wait until conversion is done
-    while(ADCSRA & (1 << ADSC)){};
-
+    while(ADCSRA & (1 << ADSC));
     // Save value of registers (must be done in this order, else value gets discarded)
     uint8_t low  = ADCL;
-        uint8_t high = ADCH;
-
+    uint8_t high = ADCH;
     // OR the two register results together to get 16 bit val.
     return high << 8 | low;
 }
@@ -119,23 +140,23 @@ Servo Position Values
 void rotateSensor(int8_t position){
     if(position == 2) {
         OCR2A = 0; //90 Right
-        while(readServoPos() > 22){};
+        while(readServoPos() > 22);
         delay(20);
     } else if(position == 1){
         OCR2A = 14; //45 Diagonal Right
-        while(readServoPos() < 156 || readServoPos() > 166){};
+        while(readServoPos() < 157 || readServoPos() > 167);
         delay(20);
     } else if(position == 0){
         OCR2A = 21; //0 Middle
-        while(readServoPos() < 301 || readServoPos() > 411){};
+        while(readServoPos() < 301 || readServoPos() > 311);
         delay(20);
     } else if(position == -1){
         OCR2A = 28; //-45 Diagonal Left
-        while(readServoPos() < 444 || readServoPos() > 464){};
+        while(readServoPos() < 444 || readServoPos() > 454);
         delay(20);
     } else if(position == -2){
         OCR2A = 36; //-90 Left
-        while(readServoPos() < 606 || readServoPos() > 616){};
+        while(readServoPos() < 606 || readServoPos() > 616);
         delay(20);
     }
 }
