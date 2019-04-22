@@ -24,7 +24,8 @@
 #include <Arduino.h>
 #include "motors.h"
 #include "ultrasonic.h"
-#include "ir.h"
+
+#define TURN_DELAY 350
 
 /* Pin Layout
  *
@@ -46,6 +47,8 @@
 */
 
 int8_t wallSide = 0;
+uint8_t state = 0;
+uint8_t turnCount = 0;
 
 //returns -2 for left, 2 for right
 int8_t findWall(){
@@ -63,40 +66,145 @@ int8_t findWall(){
  * After the wall side has been determined, follows that wall adjusting
  * it's direction depending on how far away it is from the wall.
  * 
+ * Once it's in a corner, it turns 90 degrees;
+ * moves forward until open space, turns -90 degrees;
+ * repeats 2 times,
+ * 
+ * Once it's in the run toward the wall again, it turns 90 degrees
+ * at the corner and resets to the first state of following and
+ * adjusting.
 */ 
-void followWall(){
-  moveForward();
-  delay(20);
-  uint16_t wallDistance = getDistance();
-  if(wallDistance <= 9){
-    if(wallSide == -2){
-      stopRight(20);
-    } else{
-      stopLeft(20);
+void followWall() {
+  switch (state) {
+  case 1:
+    {
+      //Get distances
+      rotateSensor(0);
+      delay(50);
+      uint16_t frontDistance = getDistance();
+      rotateSensor(wallSide);
+      delay(50);
+      uint16_t wallDistance = getDistance();
+      // front is clear
+      if(frontDistance > 13){
+        moveForward();
+        // wall too close
+        if(wallDistance < 11){
+          // adjust away from wall
+          stopLeft(2.3*(24-wallDistance));
+        } 
+        // wall too far
+        else if(wallDistance > 13){
+          // adjust towards wall
+          stopRight(2.3*wallDistance);
+        }
+      } 
+      // front too close
+      else {
+        stopMotors();
+        // turn 90
+        turnLeft();
+        delay(TURN_DELAY);
+        stopMotors();
+        delay(100);
+        //increment turn count
+        turnCount++;
+        //switch to state 2
+        state = 2;
+        // rotate sensor towards wall
+        rotateSensor(wallSide);
+        delay(50);
+      }
     }
-  } else if(wallDistance >= 13){
-    if(wallSide == -2){
-      stopLeft(20);
-    } else{
-      stopRight(20);
+    break;
+  
+  case 2:
+    {
+      if(turnCount > 2){
+        stopMotors();
+        state = 3;
+        break;
+      }
+      uint16_t wallDistance = getDistance();
+      moveForward();
+      // turn 90 degrees
+       if(wallDistance >= 24) {
+        moveForward();
+        // drive forward a bit
+        delay(700);
+        stopMotors();
+        // turn 90
+        turnRight();
+        delay(TURN_DELAY);
+        stopMotors();
+        delay(200);
+        while(getDistance() > 20){
+          moveForward();
+          //stopMotors();
+          delay(50);
+        }
+        stopMotors();
+        //increment state 2 counter
+        turnCount++;
+      }
+      // give time for US to be clear
+      delay(50);
     }
+    break;
+  
+  case 3:
+    {
+      //Get distances
+      rotateSensor(0);
+      delay(50);
+      uint16_t frontDistance = getDistance();
+      rotateSensor(wallSide);
+      delay(50);
+      uint16_t wallDistance = getDistance();
+      // front is clear
+      if(frontDistance > 11){
+        moveForward();
+        // wall too close
+        if(wallDistance < 11){
+          // adjust away from wall
+          stopLeft(2.3*(24-wallDistance));
+        } 
+        // wall too far
+        else if(wallDistance > 13){
+          // adjust towards wall
+          stopRight(2.3*wallDistance);
+        }
+      } 
+      // front too close
+      else {
+        stopMotors();
+        // turn 90
+        turnLeft();
+        delay(TURN_DELAY);
+        stopMotors();
+        delay(100);
+        //switch to state 1
+        state = 1;
+      }
+    }
+    break;
+  
+  default:
+    {
+      state = 1;
+    }
+    break;
   }
 }
 
-void setUpForWall(){
+void setup() {
+  setUpMotors(192, 185);
   setUpUltraSonic();
   testServo();
-  wallSide = findWall();
+  wallSide = 2;
   rotateSensor(wallSide);
-  moveForward();
-}
-
-void setup() {
-  setUpMotors(200, 200);
-  //setUpForWall();
-  setUpIR();
 }
 
 void loop() {
-  decodeIR();
+  followWall();
 }
