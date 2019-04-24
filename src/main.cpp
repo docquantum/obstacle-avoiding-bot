@@ -25,7 +25,7 @@
 #include "motors.h"
 #include "ultrasonic.h"
 
-#define TURN_DELAY 350
+#define TURN_DELAY 400
 
 /* Pin Layout
  *
@@ -80,21 +80,21 @@ void followWall() {
     {
       //Get distances
       rotateSensor(0);
-      delay(50);
+      delay(25);
       uint16_t frontDistance = getDistance();
       rotateSensor(wallSide);
-      delay(50);
+      delay(25);
       uint16_t wallDistance = getDistance();
       // front is clear
       if(frontDistance > 13){
         moveForward();
         // wall too close
-        if(wallDistance < 11){
+        if(wallDistance < 10){
           // adjust away from wall
           stopLeft(2.3*(24-wallDistance));
         } 
         // wall too far
-        else if(wallDistance > 13){
+        else if(wallDistance > 12){
           // adjust towards wall
           stopRight(2.3*wallDistance);
         }
@@ -131,14 +131,15 @@ void followWall() {
        if(wallDistance >= 24) {
         moveForward();
         // drive forward a bit
-        delay(700);
+        delay(600);
         stopMotors();
+        delay(100);
         // turn 90
         turnRight();
-        delay(TURN_DELAY);
+        delay(TURN_DELAY+10);
         stopMotors();
         delay(200);
-        while(getDistance() > 20){
+        while(getDistance() > 24){
           moveForward();
           //stopMotors();
           delay(50);
@@ -156,23 +157,23 @@ void followWall() {
     {
       //Get distances
       rotateSensor(0);
-      delay(50);
+      delay(25);
       uint16_t frontDistance = getDistance();
       rotateSensor(wallSide);
-      delay(50);
+      delay(25);
       uint16_t wallDistance = getDistance();
       // front is clear
-      if(frontDistance > 11){
+      if(frontDistance > 13){
         moveForward();
         // wall too close
         if(wallDistance < 11){
           // adjust away from wall
-          stopLeft(2.3*(24-wallDistance));
+          stopLeft(40);
         } 
         // wall too far
         else if(wallDistance > 13){
           // adjust towards wall
-          stopRight(2.3*wallDistance);
+          stopRight(40);
         }
       } 
       // front too close
