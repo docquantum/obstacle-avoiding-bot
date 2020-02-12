@@ -1,6 +1,6 @@
-# UNL CSCE 236 - Embedded Systems - Intelligent Robot
+# Intelligent Robot
 
-This is an assignment for the embedded systems class where we use an Arduino Uno, a robot chassis, and a few sensors with motors to create a self driving, obstacle avoiding, and overall, intelligent robot.
+This was an assignment for an embedded systems class where we use an Arduino Uno, a robot chassis, and a few sensors with motors to create a self driving, obstacle avoiding, and overall, intelligent robot.
 
 ## Wiring
 
